@@ -1,0 +1,8 @@
+# mp3 --> wav --> npy
+*.npy
+*.so
+datasets/
+venv/
+.venv
+.vscode/
+.DS_Store
