@@ -7,7 +7,8 @@ import math
 import python_speech_features
 import scipy as sp
 from scipy import signal
-# import matplotlib.pyplot as plt
+import os
+from glob import glob
 
 def invlogamplitude(S):
     return 10.0 ** (S / 10.0)
@@ -18,7 +19,7 @@ def reduce_noise_mfcc_down(y, sr):
 
     ## librosa
     mfcc = extract_features_from_song(y, sr, hop_length, n_mfcc)
-    librosa.mel_to_hz(mfcc)
+    mfcc = librosa.mel_to_hz(mfcc)
 
     ## mfcc
     # mfcc = python_speech_features.base.mfcc(y)
@@ -98,6 +99,27 @@ def load_audio_file(filename):
     
     return x, sr
 
+def generate_training_data(songs):
+    data_X = np.empty([0, 20])
+    data_Y = np.empty([0, 20])
+
+    for song in songs:
+        x, sr = load_audio_file(song)
+        mfcc = extract_features_from_song(x, sr, hop_length=512)
+        mfcc = mfcc.transpose()
+        data_X = np.concatenate((data_X, mfcc))
+
+    data_Y = data_X[1:, :]
+    data_X = data_X[:-1, :]
+
+    print(data_X.shape)
+    print(data_Y.shape)
+
+    data_X = np.reshape(data_X, (data_X.shape[0], data_X.shape[1], 1))
+    data_Y = np.reshape(data_Y, (data_Y.shape[0], data_Y.shape[1], 1))
+    np.save("../results/train_X.npy", data_X)
+    np.save("../results/train_Y.npy", data_Y)
+
 def main():
     parser = argparse.ArgumentParser(
         prog = 'Music Generation',
@@ -107,17 +129,25 @@ def main():
         add_help=True       
     )
     parser.add_argument('-i', '--input', help = 'Input Filename', required = True)
-    parser.add_argument('-o', '--output', help = 'Output Filename (wav)', required = True)
+    # parser.add_argument('-o', '--output', help = 'Output Filename (wav)', required = True)
     args = parser.parse_args()
 
-    # get input representation of audio
-    x, sr = load_audio_file(args.input)
-    mfcc = extract_features_from_song(x, sr)
+    input_song_list = [y for x in os.walk(args.input) for y in glob(os.path.join(x[0], '*.mp3'))]
+
+    generate_training_data(input_song_list)
+
+    # create_lstm_network()
+
+    # print(type(mfcc[0]))
+    # (#music files, #mfcc, #dimension of each mfcc vector)
+    # print(mfcc.shape)
+
+    # generate_training_data(mfcc)
 
     # use mfcc in ML model
 
     # generate audio back from mfcc
-    generate_audio_from_mfcc(x.shape[0], mfcc, sr, args.output)
+    # generate_audio_from_mfcc(x.shape[0], mfcc, sr, args.output)
 
 if __name__ == '__main__':
     main()
