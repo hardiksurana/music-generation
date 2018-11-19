@@ -8,13 +8,24 @@ virtualenv -p python3 venv
 source venv/bin/activate
 pip3 install -r requirements.txt
 cd code
-
 ```
 
 ## Execution Instructions
-Output file format must be **.wav**
-```
-python3 mfcc_to_wav.py --input /path/to/input_audio_file --output /path/to/input_audio_file_wav
+
+```python
+# generate input sequence
+python3 mfcc_to_wav.py --input /path/to/input_songs
+
+# find right hyperparameters for the LSTM model
+python3 tune_hyperparameters.py
+
+# train model with optimal parameters
+python3 train_lstm.py
+
+# generate new music sequences
+# Output file format must be .wav
+python3 generate.py --output /path/to/new_song_sequence.wav
+
 ```
 
 # Contribution Guidelines
