@@ -1,6 +1,7 @@
 #coding=utf-8
 import librosa
 import numpy as np
+import pandas as pd
 import argparse
 from pysndfx import AudioEffectsChain
 import math
@@ -91,7 +92,7 @@ def extract_features_from_song(x, sr, hop_length=512, n_mfcc=20):
 # load music file
 def load_audio_file(filename):
     try:
-        x, sr = librosa.load(filename, res_type='kaiser_fast')
+        x, sr = librosa.load(filename, res_type='kaiser_fast', offset=0, duration=30)
     except Exception as e:
         print("Error encountered while parsing file: ", filename)
         print(e)
@@ -101,24 +102,25 @@ def load_audio_file(filename):
 
 def generate_training_data(songs):
     data_X = np.empty([0, 20])
-    data_Y = np.empty([0, 20])
 
     for song in songs:
         x, sr = load_audio_file(song)
         mfcc = extract_features_from_song(x, sr, hop_length=512)
         mfcc = mfcc.transpose()
         data_X = np.concatenate((data_X, mfcc))
+    
+    X = pd.DataFrame(data_X)
+    Y = [X.shift(-1)]
+    Y.append(X)
+    X = pd.concat(Y, axis=1)
+    X.fillna(0, inplace=True)
+    data_X = X.values
+    x, y = data_X[:, :20], data_X[:, 20:]
+    x = x.reshape(x.shape[0], 1, x.shape[1])
+    y = y.reshape(y.shape[0], 1, y.shape[1])
 
-    data_Y = data_X[1:, :]
-    data_X = data_X[:-1, :]
-
-    print(data_X.shape)
-    print(data_Y.shape)
-
-    data_X = np.reshape(data_X, (data_X.shape[0], data_X.shape[1], 1))
-    data_Y = np.reshape(data_Y, (data_Y.shape[0], data_Y.shape[1], 1))
-    np.save("../results/train_X.npy", data_X)
-    np.save("../results/train_Y.npy", data_Y)
+    np.save("../results/train_X_3.npy", x)
+    np.save("../results/train_Y_3.npy", y)
 
 def main():
     parser = argparse.ArgumentParser(

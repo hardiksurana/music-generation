@@ -11,58 +11,58 @@
 # 	return model
 
 import numpy as np
-from keras.optimizers import SGD
-np.random.seed(1337)  # for reproducibility
+np.random.seed(1337)
 
-# from keras.layers.core import TimeDistributedDense
+from keras.optimizers import SGD
 from keras.preprocessing import sequence
 from keras.utils import np_utils
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
+from keras.layers import TimeDistributed
 from keras.layers.recurrent import LSTM
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+from sklearn.metrics import mean_squared_error, r2_score
+from hyperas import optim
+from hyperas.distributions import choice, uniform
 
-def main():
-	batch_size = 25
-	hidden_units = 10
-	
-	X = np.load("../results/train_X.npy")
-	y = np.load("../results/train_Y.npy")
+def data():
+	X = np.load("../results/train_X_3.npy")
+	y = np.load("../results/train_Y_3.npy")
 
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15)
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+	return X_train, X_test, y_train, y_test
+
+def lstm_model(X_train, X_test, y_train, y_test):
+	n_batch = 256
+	n_epoch = 5
 	
 	model = Sequential()
-	# batch_input_shape= (batch_size, X_train.shape[1], X_train.shape[2])
+	model.add(LSTM(128, input_shape=(X_train.shape[1], X_train.shape[2]), return_sequences=True, stateful=False, recurrent_dropout=0.2))
+	model.add(LSTM(64, return_sequences=True, stateful=False, recurrent_dropout=0.2))
+	model.add(LSTM(64, return_sequences=True, stateful=False, recurrent_dropout=0.2))
+	model.add(TimeDistributed(Dense(20, activation='relu')))
+	model.compile(loss='mean_squared_error',optimizer='adam', metrics=['accuracy'])
+	print(model.summary())	
+	model.fit(X_train, y_train, epochs=n_epoch, batch_size=n_batch, validation_data=(X_test, y_test), verbose=2, shuffle=False)
 
-	# note that it is necessary to pass in 3d batch_input_shape if stateful=True
-	# model.add(LSTM(64, return_sequences=True, stateful=False,
-				# batch_input_shape= (batch_size, X_train.shape[1], X_train.shape[2])))
-	# model.add(LSTM(64, return_sequences=True, stateful=False))
-	# model.add(LSTM(64, stateful=False))
-	# model.add(Dropout(.25))
-	# model.add(Dense(nb_classes, activation='softmax'))
+	return model
 
-	model.add(LSTM(64, input_shape=(X_train.shape[1], X_train.shape[2]), return_sequences=True))
-	model.add(Dropout(0.2))
-	model.add(LSTM(64))
-	model.add(Dropout(0.2))
-	model.add(Dense(y_train.shape[1], activation='softmax'))
-	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=["accuracy"])
+def main():	
+	X_train, X_test, y_train, y_test = data()
+	lstm_model(X_train, X_test, y_train, y_test)
 
-	model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=5, validation_data=(X_test, y_test))
+	yhat = model.predict(X_test, batch_size=1)
+	y_test = np.reshape(y_test, (y_test.shape[0], y_test.shape[2]))
+	yhat = np.reshape(yhat, (yhat.shape[0], yhat.shape[2]))
 
-	# for i in range(1000):
-	# 	x = numpy.reshape(pattern, (1, len(pattern), 1))
-	# 	x = x / float(n_vocab)
-	# 	prediction = model.predict(x, verbose=0)
-	# 	index = numpy.argmax(prediction)
-	# 	result = int_to_char[index]
-	# 	seq_in = [int_to_char[value] for value in pattern]
-	# 	sys.stdout.write(result)
-	# 	pattern.append(index)
-	# 	pattern = pattern[1:len(pattern)]
-	# y_pred=model.predict_classes(X_test, batch_size=batch_size)
+	print(mean_squared_error(y_test, yhat))
+
+	# for i in range(len(X_test)):
+	# 	testX, testy = X_test[i], y_test[i]
+	# 	testX = testX.reshape(1, 1, 20)
+	# 	yhat = model.predict(testX, batch_size=1)
+	# 	print(mean_squared_error(testy, yhat[0]))
+	# 	break
 
 
 if __name__ == '__main__':
