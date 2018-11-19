@@ -19,13 +19,13 @@ def reduce_noise_mfcc_down(y, sr):
     n_mfcc = 20
 
     ## librosa
-    mfcc = extract_features_from_song(y, sr, hop_length, n_mfcc)
-    mfcc = librosa.mel_to_hz(mfcc)
+    # mfcc = extract_features_from_song(y, sr, hop_length, n_mfcc)
+    # mfcc = librosa.mel_to_hz(mfcc)
 
     ## mfcc
-    # mfcc = python_speech_features.base.mfcc(y)
-    # mfcc = python_speech_features.base.logfbank(y)
-    # mfcc = python_speech_features.base.lifter(mfcc)
+    mfcc = python_speech_features.base.mfcc(y)
+    mfcc = python_speech_features.base.logfbank(y)
+    mfcc = python_speech_features.base.lifter(mfcc)
 
     sum_of_squares = []
     index = -1
@@ -80,12 +80,11 @@ def generate_audio_from_mfcc(input_shape, mfcc, sr, filename, n_mel=128, n_fft=2
     librosa.output.write_wav(filename, recon, sr)
 
     # reduce noise in output file
-    reduce_noise_from_audio(filename)
+    # reduce_noise_from_audio(filename)
 
 
 # get Mel-frequency cepstral coefficients
 def extract_features_from_song(x, sr, hop_length=512, n_mfcc=20):
-    # X = librosa.stft(x)
     mfcc = librosa.feature.mfcc(x, sr=sr, hop_length=hop_length, n_mfcc=n_mfcc)
     return mfcc
 
@@ -119,37 +118,23 @@ def generate_training_data(songs):
     x = x.reshape(x.shape[0], 1, x.shape[1])
     y = y.reshape(y.shape[0], 1, y.shape[1])
 
-    np.save("../results/train_X_3.npy", x)
-    np.save("../results/train_Y_3.npy", y)
+    np.save("../results/train_X_sample.npy", x)
+    np.save("../results/train_Y_sample.npy", y)
 
 def main():
     parser = argparse.ArgumentParser(
         prog = 'Music Generation',
         usage = 'To generate new music sequences using MFCC features',
-        description = 'python3 mfcc_to_wav.py -i [Input Filename] -o [Output Filename]',
+        description = 'python3 mfcc_to_wav.py -i [Input Filename]',
         epilog = 'MIT Licensce',
         add_help=True       
     )
     parser.add_argument('-i', '--input', help = 'Input Filename', required = True)
-    # parser.add_argument('-o', '--output', help = 'Output Filename (wav)', required = True)
     args = parser.parse_args()
 
     input_song_list = [y for x in os.walk(args.input) for y in glob(os.path.join(x[0], '*.mp3'))]
-
     generate_training_data(input_song_list)
 
-    # create_lstm_network()
-
-    # print(type(mfcc[0]))
-    # (#music files, #mfcc, #dimension of each mfcc vector)
-    # print(mfcc.shape)
-
-    # generate_training_data(mfcc)
-
-    # use mfcc in ML model
-
-    # generate audio back from mfcc
-    # generate_audio_from_mfcc(x.shape[0], mfcc, sr, args.output)
 
 if __name__ == '__main__':
     main()
