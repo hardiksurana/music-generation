@@ -1,18 +1,20 @@
 import argparse
 import numpy as np
-np.random.seed(1337)
+np.random.seed(123)
 
 from mfcc_to_wav import generate_audio_from_mfcc, reduce_noise_from_audio
 from keras.models import model_from_json
 from sklearn.model_selection import train_test_split
+from keras.utils.vis_utils import plot_model
 
 def generate(X_test):
     # load model
-    f = open('../results/lstm_model.json', 'r')
+    f = open('../results/lstm_model_sgd.json', 'r')
     model = model_from_json(f.read())
     f.close()
-    model.load_weights('../results/lstm_model_weights.h5')
+    model.load_weights('../results/lstm_model_sgd_weights.h5')
     model.compile(loss='mean_squared_error',optimizer='adam', metrics=['accuracy'])
+    # plot_model(model, to_file='../results/lstm_model_architecture.png', show_shapes=True, show_layer_names=True)
 
     # generates 30s worth of new sequences
     seq_length = 1292
@@ -41,8 +43,8 @@ def main():
     args = parser.parse_args()
 
     # load data
-    X = np.load("../results/train_X_sample.npy")
-    y = np.load("../results/train_Y_sample.npy")
+    X = np.load("../results/train_X_classical.npy")
+    y = np.load("../results/train_Y_classical.npy")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     # generate new music sequences

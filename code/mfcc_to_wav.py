@@ -99,7 +99,7 @@ def load_audio_file(filename):
     
     return x, sr
 
-def generate_training_data(songs):
+def generate_training_data(songs, n_songs):
     data_X = np.empty([0, 20])
 
     for song in songs:
@@ -114,12 +114,17 @@ def generate_training_data(songs):
     X = pd.concat(Y, axis=1)
     X.fillna(0, inplace=True)
     data_X = X.values
-    x, y = data_X[:, :20], data_X[:, 20:]
-    x = x.reshape(x.shape[0], 1, x.shape[1])
-    y = y.reshape(y.shape[0], 1, y.shape[1])
 
-    np.save("../results/train_X_sample.npy", x)
-    np.save("../results/train_Y_sample.npy", y)
+    print(data_X.shape)
+    x, y = data_X[:, :20], data_X[:, 20:]
+    x = x.reshape(int(x.shape[0] / n_songs), n_songs, x.shape[1])
+    y = y.reshape(int(y.shape[0] / n_songs), n_songs, y.shape[1])
+
+    print("Shape of X: ", x.shape)
+    print("Shape of Y: ", y.shape)
+
+    np.save("../results/train_X_classical_2.npy", x)
+    np.save("../results/train_Y_classical_2.npy", y)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -130,11 +135,17 @@ def main():
         add_help=True       
     )
     parser.add_argument('-i', '--input', help = 'Input Filename', required = True)
+    parser.add_argument('-o', '--output', help = 'Output Filename', required = True)
     args = parser.parse_args()
 
-    input_song_list = [y for x in os.walk(args.input) for y in glob(os.path.join(x[0], '*.mp3'))]
-    generate_training_data(input_song_list)
+    # input_song_list = [y for x in os.walk(args.input) for y in glob(os.path.join(x[0], '*.wav'))]
+    # print("Generating MFCCs for {0} songs.".format(len(input_song_list)))
+    # generate_training_data(input_song_list, len(input_song_list))
+    # print("MFCC Generation complete!")
 
+    x, sr = load_audio_file(args.input)
+    mfcc = extract_features_from_song(x, sr, hop_length=512)
+    generate_audio_from_mfcc(x.shape[0], mfcc, sr, args.output)
 
 if __name__ == '__main__':
     main()

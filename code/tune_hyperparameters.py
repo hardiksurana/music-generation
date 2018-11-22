@@ -15,28 +15,30 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
 def data():
-	X = np.load("../results/train_X_sample.npy")
-	y = np.load("../results/train_Y_sample.npy")
+	X = np.load("../results/train_X_sample_2_classes.npy")
+	y = np.load("../results/train_Y_sample_2_classes.npy")
 
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 	return X_train, X_test, y_train, y_test
 
 def lstm_model(X_train, X_test, y_train, y_test):
-	n_epoch = 100
+	# n_epoch = 100
 	input_shape = (X_train.shape[1], X_train.shape[2])
 
 	recurrent_dropout = {{uniform(0, 1)}}
 	n_cells = {{choice([64, 128])}}
+	n_epoch = {{choice([50, 100, 200])}}
 	optimizer = {{choice(['rmsprop', 'adam', 'sgd'])}}
 	activation = {{choice(['relu', 'tanh'])}}
-	n_batch = {{choice([64, 128])}}
+	n_batch = {{choice([32, 64, 128])}}
 
 	params = {
         'recurrent_dropout': recurrent_dropout,
         'n_cells': n_cells,
 		'optimizer': optimizer,
 		'activation': activation,
-		'n_batch': n_batch
+		'n_batch': n_batch,
+		'n_epoch': n_epoch
     }
 
 	model = Sequential()
