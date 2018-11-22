@@ -1,16 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 21 13:42:24 2018
-
-@author: Akhil
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-
 from keras import backend as K
-
 from keras.layers import Input, Dense, Lambda, Layer, Add, Multiply
 from keras.models import Model, Sequential
 from keras.datasets import mnist
@@ -18,9 +9,6 @@ from sklearn.model_selection import train_test_split
 from keras.models import load_model
 from IPython.display import SVG
 from keras.utils.vis_utils import model_to_dot
-
-
-
 
 
 original_dim = 25860

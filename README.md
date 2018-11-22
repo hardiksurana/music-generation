@@ -1,6 +1,7 @@
 # Music Generation
 
-The FMA Dataset can be found [here](https://github.com/mdeff/fma)
+The FMA dataset can be found [here](https://github.com/mdeff/fma)
+GTZan dataset can be found [here](https://marsyasweb.appspot.com/download/data_sets/)
 
 ## Setup Instructions
 ```
@@ -12,7 +13,11 @@ cd code
 
 ## Execution Instructions
 
+For LSTM:
 ```python
+# enter into LSTM folder
+cd LSTM
+
 # generate input sequence
 python3 mfcc_to_wav.py --input /path/to/input_songs
 
@@ -25,7 +30,18 @@ python3 train_lstm.py
 # generate new music sequences
 # Output file format must be .wav
 python3 generate.py --output /path/to/new_song_sequence.wav
+```
 
+For VAE:
+```python
+# enter into VAE folder
+cd VAE
+
+# generate the input representation
+python3 wav_to_mfcc.py
+
+# run the model
+python3 vae_try2.py
 ```
 
 # Contribution Guidelines

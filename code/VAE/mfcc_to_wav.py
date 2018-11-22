@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 21 14:48:59 2018
-
-@author: Akhil
-"""
-
 import numpy, scipy, matplotlib.pyplot as plt, sklearn, librosa, urllib, IPython.display
 import librosa.display
 import os, glob

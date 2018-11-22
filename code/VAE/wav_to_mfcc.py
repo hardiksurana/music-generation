@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Nov 18 19:52:14 2018
-
-@author: Akhil
-"""
-
 import numpy, scipy, matplotlib.pyplot as plt, sklearn, librosa, urllib, IPython.display
 import librosa.display
 import os, glob
@@ -15,8 +8,6 @@ import pandas
 filepath_music = 'classical/'
 signals = []
 output_numpy_name = 'mfcc_array'
-
-
 
 
 for filename in glob.glob(os.path.join(filepath_music, '*.wav')):

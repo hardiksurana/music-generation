@@ -123,8 +123,8 @@ def generate_training_data(songs, n_songs):
     print("Shape of X: ", x.shape)
     print("Shape of Y: ", y.shape)
 
-    np.save("../results/train_X_classical_2.npy", x)
-    np.save("../results/train_Y_classical_2.npy", y)
+    np.save("../../results/train_X_classical_2.npy", x)
+    np.save("../../results/train_Y_classical_2.npy", y)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -138,14 +138,10 @@ def main():
     parser.add_argument('-o', '--output', help = 'Output Filename', required = True)
     args = parser.parse_args()
 
-    # input_song_list = [y for x in os.walk(args.input) for y in glob(os.path.join(x[0], '*.wav'))]
-    # print("Generating MFCCs for {0} songs.".format(len(input_song_list)))
-    # generate_training_data(input_song_list, len(input_song_list))
-    # print("MFCC Generation complete!")
-
-    x, sr = load_audio_file(args.input)
-    mfcc = extract_features_from_song(x, sr, hop_length=512)
-    generate_audio_from_mfcc(x.shape[0], mfcc, sr, args.output)
+    input_song_list = [y for x in os.walk(args.input) for y in glob(os.path.join(x[0], '*.wav'))]
+    print("Generating MFCCs for {0} songs.".format(len(input_song_list)))
+    generate_training_data(input_song_list, len(input_song_list))
+    print("MFCC Generation complete!")
 
 if __name__ == '__main__':
     main()

@@ -15,8 +15,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
 def data():
-	X = np.load("../results/train_X_sample_2_classes.npy")
-	y = np.load("../results/train_Y_sample_2_classes.npy")
+	X = np.load("../../results/train_X_sample_2_classes.npy")
+	y = np.load("../../results/train_Y_sample_2_classes.npy")
 
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 	return X_train, X_test, y_train, y_test

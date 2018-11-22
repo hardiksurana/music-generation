@@ -9,10 +9,10 @@ from keras.utils.vis_utils import plot_model
 
 def generate(X_test):
     # load model
-    f = open('../results/lstm_model_sgd.json', 'r')
+    f = open('../../results/lstm_model_sgd.json', 'r')
     model = model_from_json(f.read())
     f.close()
-    model.load_weights('../results/lstm_model_sgd_weights.h5')
+    model.load_weights('../../results/lstm_model_sgd_weights.h5')
     model.compile(loss='mean_squared_error',optimizer='adam', metrics=['accuracy'])
     # plot_model(model, to_file='../results/lstm_model_architecture.png', show_shapes=True, show_layer_names=True)
 
@@ -43,8 +43,8 @@ def main():
     args = parser.parse_args()
 
     # load data
-    X = np.load("../results/train_X_classical.npy")
-    y = np.load("../results/train_Y_classical.npy")
+    X = np.load("../../results/train_X_classical.npy")
+    y = np.load("../../results/train_Y_classical.npy")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     # generate new music sequences

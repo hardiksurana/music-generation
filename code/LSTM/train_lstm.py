@@ -16,8 +16,8 @@ from keras.utils.vis_utils import plot_model
 
 
 def main():
-    X = np.load("../results/train_X_classical.npy")
-    y = np.load("../results/train_Y_classical.npy")
+    X = np.load("../../results/train_X_classical.npy")
+    y = np.load("../../results/train_Y_classical.npy")
     n_songs = 100
 
     '''
@@ -66,12 +66,12 @@ def main():
     early_stop = EarlyStopping(monitor='val_loss', min_delta=5, patience=5, verbose=2)
     model.compile(loss='mean_squared_error',optimizer='rmsprop', metrics=['accuracy'])
     print(model.summary())
-    plot_model(model, to_file='../results/model_architecture.png', show_shapes=True, show_layer_names=True)
+    plot_model(model, to_file='../../results/model_architecture.png', show_shapes=True, show_layer_names=True)
     model.fit(X_train, y_train, epochs=n_epoch, batch_size=n_batch, validation_data=(X_test, y_test), verbose=2, shuffle=False, callbacks=[early_stop])
 
-    with open('../results/lstm_model_sgd_3.json', 'w') as f:
+    with open('../../results/lstm_model_sgd_2.json', 'w') as f:
         f.write(model.to_json())
-    model.save_weights('../results/lstm_model_sgd_weights_3.h5')
+    model.save_weights('../../results/lstm_model_sgd_weights_2.h5')
 
     loss, accuracy = model.evaluate(X_test, y_test)
     print(loss, accuracy)
